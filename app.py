@@ -40,7 +40,7 @@ def preprocess_input(data):
 # --- INTERFACE DO USUÁRIO COM STREAMLIT ---
 
 st.set_page_config(page_title="Previsão de Marketing Bancário", layout="wide")
-st.title('🤖 Aplicação de Previsão de Adesão à uma Campanha Bancária')
+st.title('🤖 Aplicação de Previsão de Adesão a uma Campanha Bancária')
 st.write('Esta aplicação utiliza um modelo de Machine Learning (Random Forest) para prever se um cliente irá aderir a uma campanha de marketing de um banco.')
 st.write('Preencha os dados do cliente abaixo para receber a previsão.')
 
