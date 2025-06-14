@@ -73,7 +73,6 @@ with col2:
 with col3:
     st.subheader("Última Campanha")
     user_input['tipo_contato'] = st.selectbox('Meio de Contato', options=encoders['tipo_contato'].classes_)
-    user_input['dia_da_semana'] = st.slider('Último Dia da Semana de Contato', 0, 6, 3)
     user_input['mes_contato'] = st.selectbox('Último Mês de Contato', options=encoders['mes_contato'].classes_)
     user_input['duracao_contato'] = st.number_input('Duração do Último Contato (segundos)', value=200, min_value=0)
     user_input['numero_contatos'] = st.number_input('Nº de Contatos Nesta Campanha', value=1, min_value=1)
