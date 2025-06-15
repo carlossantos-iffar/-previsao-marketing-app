@@ -45,7 +45,7 @@ def preprocess_input(data):
 st.set_page_config(page_title="Previsão de Marketing Bancário", layout="wide")
 st.title('🤖 Aplicação de Previsão de Adesão a uma Campanha Bancária')
 st.title('Por: Professor Carlos Santos - Instituto Federal Farroupilha Câmpus Alegrete')
-st.write('Esta aplicação utiliza um modelo de Machine Learning (Random Forest) para prever se um cliente irá aderir a uma campanha de marketing de um banco.')
+st.write('Esta aplicação utiliza um modelo de Machine Learning (SVM) para prever se um cliente irá aderir a uma campanha de marketing de um banco.')
 st.write('Preencha os dados do cliente abaixo para receber a previsão.')
 
 st.divider()
@@ -83,17 +83,18 @@ with col3:
 # Botão de Previsão
 if st.button('Fazer Previsão', type="primary"):
     processed_data = preprocess_input(user_input)
-    prediction = model.predict(processed_data)
-    prediction_proba = model.predict_proba(processed_data)
+    prediction_proba = model.predict_proba(processed_data)[0][1]  # probabilidade da classe "sim"
+    threshold = 0.3
+    prediction = int(prediction_proba >= threshold)
 
     st.divider()
     st.subheader('Resultado da Previsão:')
 
-    resultado_texto = encoders['assinou_deposito'].inverse_transform(prediction)[0]
+    resultado_texto = encoders['assinou_deposito'].inverse_transform([prediction])[0]
 
     if resultado_texto == 'yes':
         st.success('O cliente provavelmente VAI ADERIR à campanha! ✅')
-        st.write(f"**Confiança da Previsão:** {prediction_proba[0][1]*100:.2f}%")
+        st.write(f"**Confiança da Previsão:** {prediction_proba*100:.2f}%")
     else:
         st.error('O cliente provavelmente NÃO VAI ADERIR à campanha. ❌')
-        st.write(f"**Confiança da Previsão:** {prediction_proba[0][0]*100:.2f}%")
+        st.write(f"**Confiança da Previsão:** {(1 - prediction_proba)*100:.2f}%")
