@@ -44,7 +44,7 @@ def preprocess_input(data):
 
 st.set_page_config(page_title="Previsão de Marketing Bancário", layout="wide")
 st.title('🤖 Aplicação de Previsão de Adesão a uma Campanha Bancária')
-st.title('Por: Professor Carlos Santos - Instituto Federal Farroupilha Câmpus Alegrete')
+st.write('Por: Professor Carlos Santos - Instituto Federal Farroupilha Câmpus Alegrete')
 st.write('Esta aplicação utiliza um modelo de Machine Learning (SVM) para prever se um cliente irá aderir a uma campanha de marketing de um banco.')
 st.write('Preencha os dados do cliente abaixo para receber a previsão.')
 
