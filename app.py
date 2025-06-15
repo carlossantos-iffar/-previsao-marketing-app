@@ -4,7 +4,7 @@ import joblib
 
 # Carregar o modelo, os encoders, as colunas e o scaler
 try:
-    model = joblib.load('modelo_random_forest.joblib')
+    model = joblib.load('modelo_svm_model.joblib')
     encoders = joblib.load('encoders.joblib')
     model_columns = joblib.load('colunas_modelo.joblib')
     scaler = joblib.load('scaler.joblib')  # ✅ carregando o scaler
