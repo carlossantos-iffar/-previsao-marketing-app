@@ -7,18 +7,19 @@ try:
     model = joblib.load('modelo_svm_model.joblib')
     encoders = joblib.load('encoders.joblib')
     model_columns = joblib.load('colunas_modelo.joblib')
-    scaler = joblib.load('scaler.joblib')
+    scaler = joblib.load('scaler.joblib')  # ✅ carregando o scaler
 except FileNotFoundError:
     st.error("Arquivos de modelo, encoders ou scaler não encontrados. Certifique-se de que estão na mesma pasta que o app.py.")
     st.stop()
 
 # --- FUNÇÃO DE PRÉ-PROCESSAMENTO ---
 def preprocess_input(data):
+    # Cria um DataFrame com os dados do usuário
     user_df = pd.DataFrame([data])
 
     # Aplica os encoders nas colunas categóricas
     for column, encoder in encoders.items():
-        if column in user_df.columns and column != 'y':
+        if column in user_df.columns and column != 'assinou_deposito':
             valor_usuario = user_df[column].iloc[0]
             if valor_usuario in encoder.classes_:
                 user_df[column] = encoder.transform([valor_usuario])[0]
@@ -34,7 +35,7 @@ def preprocess_input(data):
         if col in processed_df.columns:
             processed_df[col] = user_df[col].values[0]
 
-    # Aplica o scaler para normalizar os dados
+    # ✅ Aplica o scaler para normalizar os dados
     processed_scaled = scaler.transform(processed_df)
 
     return processed_scaled
@@ -43,51 +44,53 @@ def preprocess_input(data):
 
 st.set_page_config(page_title="Previsão de Marketing Bancário", layout="wide")
 st.title('🤖 Aplicação de Previsão de Adesão a uma Campanha Bancária')
-st.title('Por: Professor Carlos Santos - Instituto Federal Farroupilha Câmpus Alegrete')
+st.write('Por: Professor Carlos Santos - Instituto Federal Farroupilha Câmpus Alegrete')
 st.write('Esta aplicação utiliza um modelo de Machine Learning (SVM) para prever se um cliente irá aderir a uma campanha de marketing de um banco.')
 st.write('Preencha os dados do cliente abaixo para receber a previsão.')
 
 st.divider()
 
+# Criando colunas para organizar os campos de entrada
 col1, col2, col3 = st.columns(3)
 
+# Dicionário para armazenar as entradas do usuário
 user_input = {}
 
 with col1:
     st.subheader("Informações Pessoais")
-    user_input['age'] = st.number_input('Idade', min_value=18, max_value=100, value=40)
-    user_input['job'] = st.selectbox('Profissão', options=encoders['job'].classes_)
-    user_input['marital'] = st.selectbox('Estado Civil', options=encoders['marital'].classes_)
-    user_input['education'] = st.selectbox('Escolaridade', options=encoders['education'].classes_)
+    user_input['idade'] = st.number_input('Idade', min_value=18, max_value=100, value=40)
+    user_input['profissao'] = st.selectbox('Profissão', options=encoders['profissao'].classes_)
+    user_input['estado_civil'] = st.selectbox('Estado Civil', options=encoders['estado_civil'].classes_)
+    user_input['escolaridade'] = st.selectbox('Escolaridade', options=encoders['escolaridade'].classes_)
 
 with col2:
     st.subheader("Histórico com o Banco")
-    user_input['default'] = st.selectbox('Possui Inadimplência?', options=encoders['default'].classes_)
-    user_input['housing'] = st.selectbox('Possui Empréstimo Imobiliário?', options=encoders['housing'].classes_)
-    user_input['loan'] = st.selectbox('Possui Empréstimo Pessoal?', options=encoders['loan'].classes_)
+    user_input['inadimplente'] = st.selectbox('Possui Inadimplência?', options=encoders['inadimplente'].classes_)
+    user_input['saldo_medio_anual'] = st.number_input('Saldo Médio Anual (em Euros)', value=1500)
+    user_input['emprestimo_habitacional'] = st.selectbox('Possui Empréstimo Imobiliário?', options=encoders['emprestimo_habitacional'].classes_)
+    user_input['emprestimo_pessoal'] = st.selectbox('Possui Empréstimo Pessoal?', options=encoders['emprestimo_pessoal'].classes_)
 
 with col3:
     st.subheader("Última Campanha")
-    user_input['contact'] = st.selectbox('Meio de Contato', options=encoders['contact'].classes_)
-    user_input['month'] = st.selectbox('Último Mês de Contato', options=encoders['month'].classes_)
-    user_input['day_of_week'] = st.selectbox('Dia da Semana do Contato', options=encoders['day_of_week'].classes_)
-    user_input['duration'] = st.number_input('Duração do Último Contato (segundos)', value=200, min_value=0)
-    user_input['campaign'] = st.number_input('Nº de Contatos Nesta Campanha', value=1, min_value=1)
-    user_input['pdays'] = st.number_input('Dias desde Último Contato (campanha anterior)', value=-1, min_value=-1)
-    user_input['previous'] = st.number_input('Nº de Contatos (campanha anterior)', value=0, min_value=0)
-    user_input['poutcome'] = st.selectbox('Resultado da Campanha Anterior', options=encoders['poutcome'].classes_)
+    user_input['tipo_contato'] = st.selectbox('Meio de Contato', options=encoders['tipo_contato'].classes_)
+    user_input['mes_contato'] = st.selectbox('Último Mês de Contato', options=encoders['mes_contato'].classes_)
+    user_input['duracao_contato'] = st.number_input('Duração do Último Contato (segundos)', value=200, min_value=0)
+    user_input['numero_contatos'] = st.number_input('Nº de Contatos Nesta Campanha', value=1, min_value=1)
+    user_input['dias_ultimo_contato'] = st.number_input('Dias Desde o Último Contato (campanha anterior)', value=-1, min_value=-1)
+    user_input['contatos_anteriores'] = st.number_input('Nº de Contatos (campanha anterior)', value=0, min_value=0)
+    user_input['resultado_campanha_anterior'] = st.selectbox('Resultado da Campanha Anterior', options=encoders['resultado_campanha_anterior'].classes_)
 
 # Botão de Previsão
 if st.button('Fazer Previsão', type="primary"):
     processed_data = preprocess_input(user_input)
-    prediction_proba = model.predict_proba(processed_data)[0][1]
+    prediction_proba = model.predict_proba(processed_data)[0][1]  # probabilidade da classe "sim"
     threshold = 0.3
     prediction = int(prediction_proba >= threshold)
 
     st.divider()
     st.subheader('Resultado da Previsão:')
 
-    resultado_texto = encoders['y'].inverse_transform([prediction])[0]
+    resultado_texto = encoders['assinou_deposito'].inverse_transform([prediction])[0]
 
     if resultado_texto == 'yes':
         st.success('O cliente provavelmente VAI ADERIR à campanha! ✅')
