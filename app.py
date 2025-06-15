@@ -80,9 +80,6 @@ with col3:
     user_input['contatos_anteriores'] = st.number_input('Nº de Contatos (campanha anterior)', value=0, min_value=0)
     user_input['resultado_campanha_anterior'] = st.selectbox('Resultado da Campanha Anterior', options=encoders['resultado_campanha_anterior'].classes_)
 
-st.write("Dados processados para o modelo:")
-st.write(processed_data)
-
 # Botão de Previsão
 if st.button('Fazer Previsão', type="primary"):
     processed_data = preprocess_input(user_input)
